@@ -262,7 +262,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 646533c28e2636a49a666b7837ec0258, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementVelocity: 10
+  meshSkinWidth: 0.1
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 512
+  bulletVelocity: 0.2
   lifeTime: 2
   collisionEffect: {fileID: 2055171405781055776, guid: d8d8c1d7d57401c4597155b6cbf113a2,
     type: 3}
