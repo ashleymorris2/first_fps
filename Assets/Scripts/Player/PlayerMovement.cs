@@ -6,9 +6,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] Transform playerCameraTransform;
     [SerializeField] Transform playerFeet;
     [SerializeField] LayerMask jumpableTerrain;
-    [SerializeField] Animator animator;
 
-    [SerializeField] float crouchedHeight;
     [SerializeField] float mouseSensitivity = 3.5f;
     [SerializeField] float gravityMultiplier = 2f;
     [SerializeField] float jumpPower;
@@ -41,7 +39,6 @@ public class PlayerMovement : MonoBehaviour
     {
         HandleMovement();
         HandleMouseLook();
-        HandleCrouchInput();
         HandleJumping();
         ApplyGravity();
 
@@ -73,18 +70,6 @@ public class PlayerMovement : MonoBehaviour
 
         playerCameraTransform.localEulerAngles = Vector3.right * cameraPitch;
         playerController.transform.Rotate(Vector3.up * mouseDelta.x * mouseSensitivity);
-    }
-
-    private void HandleCrouchInput()
-    {
-        if (Input.GetKey(KeyCode.LeftControl))
-        {
-            HandleCrouch();
-        }
-        else
-        {
-            HandleStand();
-        }
     }
 
     private void HandleJumping()
@@ -122,36 +107,11 @@ public class PlayerMovement : MonoBehaviour
         playerController.Move(playerFallVelocity * Time.deltaTime);
     }
 
-    private float lerpHeight(float newHeight)
-    {
-        return (float)Math.Round(Mathf.Lerp(playerController.height, newHeight, 12.5f * Time.deltaTime), 3);
-    }
-
-    private void HandleCrouch()
-    {
-        var newHeight = lerpHeight(crouchedHeight);
-        playerController.height = playerController.height - 0.5f <= crouchedHeight ? crouchedHeight : newHeight;
-    }
-
-    private void HandleStand()
-    {
-        var newHeight = lerpHeight(standingHeight);
-
-        if (Physics.Raycast(transform.position, transform.up, out var hit, standingHeight))
-        {
-            if (hit.distance < standingHeight - crouchedHeight)
-            {
-                newHeight = lerpHeight((crouchedHeight + hit.distance) - 0.20f);
-            }
-        }
-
-        playerController.height = playerController.height + 0.15f >= standingHeight ? standingHeight : newHeight;
-    }
-
     private void HandleShoot()
     {
         if (Input.GetMouseButtonDown(0))
         {
+            //Check to see if there is anything to shoot at and direct our bullets towards it
             if (Physics.Raycast(playerCameraTransform.position, playerCameraTransform.forward, out var hit, 50f))
             {
                 if (Vector3.Distance(playerCameraTransform.position, hit.point) > 2f)
@@ -165,7 +125,6 @@ public class PlayerMovement : MonoBehaviour
             }
 
             Instantiate(bullet, firePoint.position, firePoint.rotation);
-
         }
     }
 
