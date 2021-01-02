@@ -266,8 +266,8 @@ MonoBehaviour:
   layerMask:
     serializedVersion: 2
     m_Bits: 512
-  bulletVelocity: 0.2
-  lifeTime: 2
+  bulletVelocity: 120
+  lifeTime: 10
   collisionEffect: {fileID: 2055171405781055776, guid: d8d8c1d7d57401c4597155b6cbf113a2,
     type: 3}
   bulletDirection: {fileID: 7057866689862577121}

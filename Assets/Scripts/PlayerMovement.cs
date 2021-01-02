@@ -44,7 +44,7 @@ public class PlayerMovement : MonoBehaviour
         HandleCrouchInput();
         HandleJumping();
         ApplyGravity();
-        
+
         HandleShoot();
     }
 
@@ -150,9 +150,22 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleShoot()
     {
-        if(Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0))
         {
+            if (Physics.Raycast(playerCameraTransform.position, playerCameraTransform.forward, out var hit, 50f))
+            {
+                if (Vector3.Distance(playerCameraTransform.position, hit.point) > 2f)
+                {
+                    firePoint.LookAt(hit.point);
+                }
+            }
+            else
+            {
+                firePoint.LookAt(playerCameraTransform.position + (playerCameraTransform.forward * 30));
+            }
+
             Instantiate(bullet, firePoint.position, firePoint.rotation);
+
         }
     }
 
