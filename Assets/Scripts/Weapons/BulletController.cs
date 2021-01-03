@@ -5,8 +5,8 @@ public class BulletController : MonoBehaviour
 
     [SerializeField] float meshSkinWidth = 0.1f;
     [SerializeField] LayerMask layerMask;
-    [SerializeField] float bulletVelocity;
-    [SerializeField] float lifeTime;
+    [SerializeField] float bulletVelocity = 90;
+    [SerializeField] float lifeTime = 8;
     [SerializeField] GameObject collisionEffect;
     [SerializeField] Transform bulletDirection;
 
@@ -19,6 +19,8 @@ public class BulletController : MonoBehaviour
     private Rigidbody bulletModel;
     private Collider bulletCollider;
 
+     public bool isEnemyBullet{get; set;} 
+     public bool isPlayerBullet{get; set;}
 
     void Start()
     {
@@ -35,6 +37,13 @@ public class BulletController : MonoBehaviour
 
     void FixedUpdate()
     {
+        CheckForCollision();
+        Move();
+        Expire();
+    }
+
+    private void CheckForCollision()
+    {
         Vector3 movementThisUpdate = bulletModel.position - previousPosition;
         float movementSqrMagnitude = movementThisUpdate.sqrMagnitude;
 
@@ -48,22 +57,28 @@ public class BulletController : MonoBehaviour
                 if (!hitInfo.collider)
                     return;
 
-                if (hitInfo.collider.isTrigger && hitInfo.distance < 0.5f)
+                if (hitInfo.collider.isTrigger)
                     hitInfo.collider.SendMessage("OnTriggerEnter", bulletCollider); //Collider is a trigger let them handle OnTriggerEnter
 
-                if (!hitInfo.collider.isTrigger && hitInfo.distance < 0.1f)
-                    OnTriggerEnter(hitInfo.collider); //Collider doesn't have a trigger and we've almost hit the collider, call out own OnTriggerEnter..
-
                 if (!hitInfo.collider.isTrigger)
+                {
+                    OnTriggerEnter(hitInfo.collider);//Collider doesn't have a trigger call our own OnTriggerEnter..
                     bulletModel.position = hitInfo.point - (movementThisUpdate / movementMagnitude) * partialMoveExtent;
+                }
             }
         }
 
         previousPosition = bulletModel.position;
+    }
 
+    private void Move()
+    {
         bulletModel.AddForce(bulletDirection.forward * bulletVelocity, ForceMode.VelocityChange);
         bullet.transform.position = bulletModel.position;
+    }
 
+    private void Expire()
+    {
         lifeTime -= Time.deltaTime;
 
         if (lifeTime <= 0)
@@ -75,13 +90,19 @@ public class BulletController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-            if(other.gameObject.tag == "Enemy")
-            {
-                Destroy(other.gameObject);
-            }
-            Instantiate(collisionEffect, bullet.transform.position + (bullet.transform.forward * ((-bulletVelocity * .015f) * Time.deltaTime)), bullet.transform.rotation);
-            Destroy(bullet);
-            Debug.Log($"Destroyed ----- I {gameObject} Hit {other}");
+        if (other.gameObject.tag == "Enemy" && !isEnemyBullet)
+        {
+            other.gameObject.GetComponent<EnemyHealth>()?.TakeDamage(25);
+            Debug.Log($"I {gameObject} Hit {other}");
+        }
         
+        if (other.gameObject.tag == "Player" && !isPlayerBullet)
+        {
+            Debug.Log($"Hit player at {transform.position}");
+        }
+
+        Instantiate(collisionEffect, bullet.transform.position, bullet.transform.rotation);
+        Destroy(bullet);
     }
+
 }

@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -114,7 +113,7 @@ public class PlayerMovement : MonoBehaviour
             //Check to see if there is anything to shoot at and direct our bullets towards it
             if (Physics.Raycast(playerCameraTransform.position, playerCameraTransform.forward, out var hit, 50f))
             {
-                if (Vector3.Distance(playerCameraTransform.position, hit.point) > 2f)
+                if (Vector3.Distance(playerCameraTransform.position, hit.point) > 1f)
                 {
                     firePoint.LookAt(hit.point);
                 }
@@ -123,6 +122,9 @@ public class PlayerMovement : MonoBehaviour
             {
                 firePoint.LookAt(playerCameraTransform.position + (playerCameraTransform.forward * 30));
             }
+
+            var bulletController = bullet.GetComponentInChildren<BulletController>();
+            bulletController.isPlayerBullet = true;
 
             Instantiate(bullet, firePoint.position, firePoint.rotation);
         }
