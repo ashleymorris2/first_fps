@@ -19,8 +19,8 @@ public class BulletController : MonoBehaviour
     private Rigidbody bulletModel;
     private Collider bulletCollider;
 
-     public bool isEnemyBullet{get; set;} 
-     public bool isPlayerBullet{get; set;}
+    public bool isEnemyBullet { get; set; }
+    public bool isPlayerBullet { get; set; }
 
     void Start()
     {
@@ -90,15 +90,25 @@ public class BulletController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        var damage = 25;
+
         if (other.gameObject.tag == "Enemy" && !isEnemyBullet)
         {
-            other.gameObject.GetComponent<EnemyHealth>()?.TakeDamage(25);
-            Debug.Log($"I {gameObject} Hit {other}");
+            other.gameObject.GetComponent<EnemyHealth>()?.TakeDamage(damage);
+            Debug.Log($"I {gameObject} isEnemyBullet = {isEnemyBullet} isPlayerBullet = {isPlayerBullet} Hit {other}");
         }
-        
+
+        if (other.gameObject.tag == "Headshot" && !isEnemyBullet)
+        {
+
+            other.transform.parent.GetComponent<EnemyHealth>().TakeDamage(damage * 2);
+            Debug.Log($"I {gameObject} isEnemyBullet = {isEnemyBullet} isPlayerBullet = {isPlayerBullet} Hit {other} - HEADSHOT");
+        }
+
         if (other.gameObject.tag == "Player" && !isPlayerBullet)
         {
             Debug.Log($"Hit player at {transform.position}");
+            PlayerHealth.Instance.TakeDamage(damage);
         }
 
         Instantiate(collisionEffect, bullet.transform.position, bullet.transform.rotation);

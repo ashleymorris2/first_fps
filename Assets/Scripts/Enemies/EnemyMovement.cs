@@ -6,13 +6,13 @@ public class EnemyMovement : MonoBehaviour
     [SerializeField] float chaseProximity = 10f;
     [SerializeField] float loseDistance = 15f;
     [SerializeField] float stopDistance = 2f;
-    [SerializeField] NavMeshAgent navigationAgent;
+    [SerializeField] NavMeshAgent enemyNavigation;
 
- 
     private bool chasing;
-
     private float chaseTime = 5f;
     private float chaseCounter;
+
+    private Animator animator;
 
     private Vector3 targetPoint;
     private Vector3 startPoint;
@@ -21,6 +21,7 @@ public class EnemyMovement : MonoBehaviour
     void Start()
     {
         startPoint = transform.position;
+        animator = GetComponentInChildren<Animator>();
     }
 
     void Update()
@@ -39,6 +40,7 @@ public class EnemyMovement : MonoBehaviour
             {
                 chasing = true;
                 GetComponent<EnemyAttack>().StartAttackCountDown();
+
             }
 
             DecrementChaseCounter();
@@ -46,6 +48,7 @@ public class EnemyMovement : MonoBehaviour
 
         else
         {
+            animator.SetBool("isMoving", true);
             CheckIfWithinStopingDistance();
             GetComponent<EnemyAttack>().FireAtPlayer();
         }
@@ -60,11 +63,12 @@ public class EnemyMovement : MonoBehaviour
         //Stop at our current position - stops the enemy getting up in our junk
         if (Vector3.Distance(transform.position, targetPoint) > stopDistance)
         {
-            navigationAgent.destination = targetPoint; 
+            enemyNavigation.destination = targetPoint;
+            transform.LookAt(Player.instance.transform.position);
         }
         else
         {
-            navigationAgent.destination = transform.position;
+            enemyNavigation.destination = transform.position;
         }
 
         //Stop chasing and reset the counter if we're further away from the player than the lose distance
@@ -83,8 +87,18 @@ public class EnemyMovement : MonoBehaviour
 
             if (chaseCounter <= 0)
             {
-                navigationAgent.destination = startPoint;
+                enemyNavigation.destination = startPoint;
             }
+        }
+
+        if (enemyNavigation.remainingDistance < 1)
+        {
+            animator.SetBool("isMoving", false);
+            animator.SetTrigger("fireShot");
+        }
+        else
+        {
+            animator.SetBool("isMoving", true);
         }
     }
 

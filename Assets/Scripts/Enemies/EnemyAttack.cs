@@ -11,12 +11,14 @@ public class EnemyAttack : MonoBehaviour
     public float fireCount { private get; set; }
     public float shotWaitCounter { private get; set; }
     public float shootTimeCounter { private get; set; }
-
+    public Animator animator { get; private set; }
 
     void Start()
     {
         shootTimeCounter = timeToShoot;
         shotWaitCounter = timeBetweenShots;
+
+        animator = GetComponentInChildren<Animator>();
 
         var bulletController = bullet.GetComponentInChildren<BulletController>();
         bulletController.isEnemyBullet = true;
@@ -72,6 +74,9 @@ public class EnemyAttack : MonoBehaviour
             {
                 shotWaitCounter = timeBetweenShots;
             }
+
+            animator.SetBool("isMoving", false);
+            animator.SetTrigger("fireShot");
         }
     }
 }
